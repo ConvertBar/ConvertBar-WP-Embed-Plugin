@@ -53,10 +53,8 @@ function cb_admin_notice() {
 }
 
 //Thank you velcrow: http://stackoverflow.com/a/4694816/2167545
-function is_valid_domain_name( $domain_name ) {
-	return ( preg_match( '/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i', $domain_name ) //valid chars check
-	         && preg_match( '/^.{1,253}$/', $domain_name ) //overall length check
-	         && preg_match( '/^[^\.]{1,63}(\.[^\.]{1,63})*$/', $domain_name ) ); //length of each label
+function is_valid_uuid4( $domain_name ) {
+	return preg_match( '^/[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $domain_name );
 }
 
 
@@ -67,7 +65,7 @@ function cb_show_convertbar_page() {
 	}
 	if ( array_key_exists( "convertbar-code", $_POST ) ) {
 		$embedCode = $_POST["convertbar-code"];
-		if ( is_string( $embedCode ) && check_embed_code( $embedCode ) ) {
+		if ( is_valid_uuid4( $embedCode ) && check_embed_code( $embedCode ) ) {
 			update_option( "convertbar_embed_id", $embedCode );
 			$success = true;
 		} else {
