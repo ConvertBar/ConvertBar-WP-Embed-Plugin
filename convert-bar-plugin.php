@@ -12,17 +12,17 @@ Tested up to: 4.7
 Requires at least: 3.0.0
 */
 
-function cb_is_embed_code_set() {
+function convbar_is_embed_code_set() {
 	return ! ! get_option( "convertbar_embed_id", false );
 }
 
-function convertbar_activation_redirect( $plugin ) {
+function convbar_activation_redirect( $plugin ) {
 	if ( $plugin == plugin_basename( __FILE__ ) ) {
 		exit( wp_redirect( admin_url( "admin.php?page=convertbar" ) ) );
 	}
 }
 
-function check_embed_code( $embedCode ) {
+function convbar_check_embed_code( $embedCode ) {
 	$url    = "https://app.convertbar.com/check-embed-code?embed-code=" . urlencode( $embedCode );
 	$remote = wp_remote_get( $url );
 	$result = json_decode( $remote["body"], true );
@@ -31,7 +31,7 @@ function check_embed_code( $embedCode ) {
 
 }
 
-function cb_add_embed_script() {
+function convbar_add_embed_script() {
 	wp_enqueue_script(
 		'convertbar-script',
 		"https://app.convertbar.com/embed/" . get_option( "convertbar_embed_id", "" ) . "/convertbar.js",
@@ -41,9 +41,9 @@ function cb_add_embed_script() {
 	);
 }
 
-function cb_admin_notice() {
+function convbar_admin_notice() {
 	global $pagenow;
-	if ( ! ( ( $pagenow == 'admin.php' || $pagenow == 'tools.php' ) && ( $_GET['page'] == 'convertbar' ) ) && ! cb_is_embed_code_set() ) {
+	if ( ! ( ( $pagenow == 'admin.php' || $pagenow == 'tools.php' ) && ( $_GET['page'] == 'convertbar' ) ) && ! convbar_is_embed_code_set() ) {
 		?>
         <div class="notice notice-error is-dismissible"><p><a
                         href="<?php admin_url( "admin.php?page=convertbar" ) ?>">Please
@@ -53,19 +53,19 @@ function cb_admin_notice() {
 }
 
 //Thank you velcrow: http://stackoverflow.com/a/4694816/2167545
-function is_valid_uuid4( $domain_name ) {
+function convbar_is_valid_uuid4( $domain_name ) {
 	return preg_match( '^/[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i', $domain_name );
 }
 
 
-function cb_show_convertbar_page() {
+function convbar_show_convertbar_page() {
 	$success = null;
-	if ( cb_is_embed_code_set() ) {
+	if ( convbar_is_embed_code_set() ) {
 		$success = true;
 	}
 	if ( array_key_exists( "convertbar-code", $_POST ) ) {
 		$embedCode = $_POST["convertbar-code"];
-		if ( is_valid_uuid4( $embedCode ) && check_embed_code( $embedCode ) ) {
+		if ( convbar_is_valid_uuid4( $embedCode ) && convbar_check_embed_code( $embedCode ) ) {
 			update_option( "convertbar_embed_id", $embedCode );
 			$success = true;
 		} else {
@@ -77,7 +77,7 @@ function cb_show_convertbar_page() {
 	include( "embed-page.php" );
 }
 
-function cb_add_admin_page() {
+function convbar_add_admin_page() {
 	add_submenu_page(
 		'tools.php',
 		'ConvertBar',
@@ -88,7 +88,7 @@ function cb_add_admin_page() {
 	);
 }
 
-function cb_load_admin_style() {
+function convbar_load_admin_style() {
 	global $pagenow;
 
 	if ( ( ( $pagenow == 'admin.php' || $pagenow == 'tools.php' ) && array_key_exists( 'page',
@@ -101,8 +101,8 @@ function cb_load_admin_style() {
 }
 
 
-add_action( 'admin_enqueue_scripts', 'cb_load_admin_style' );
-add_action( 'admin_notices', 'cb_admin_notice' );
-add_action( 'wp_enqueue_scripts', 'cb_add_embed_script' );
-add_action( 'activated_plugin', 'convertbar_activation_redirect' );
-add_action( 'admin_menu', 'cb_add_admin_page' );
+add_action( 'admin_enqueue_scripts', 'convbar_load_admin_style' );
+add_action( 'admin_notices', 'convbar_admin_notice' );
+add_action( 'wp_enqueue_scripts', 'convbar_add_embed_script' );
+add_action( 'activated_plugin', 'convbar_activation_redirect' );
+add_action( 'admin_menu', 'convbar_add_admin_page' );

@@ -7,7 +7,10 @@ Stable tag: 1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin will automatically add the proper embed code for ConvertBar.com to your website's header
+This plugin will automatically add the proper embed code for ConvertBar.com to your website's header.
+
+Our plugin will use the API of the website app.convertbar.com to validate your embed code. This website will also
+ provide the code that does the actual work of rendering your convert bars
 
 == Installation ==
 
